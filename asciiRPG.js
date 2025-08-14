@@ -9,9 +9,15 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
 ctx.font = '14px monospace';
+const cellSize = 14;
 
-const cols = Math.floor(canvas.width / 14);
-const rows = Math.floor(canvas.height / 14);
+// マップサイズ（文字数）
+const mapCols = 50;
+const mapRows = 30;
+
+// マップオフセット（黒背景の余白を残す）
+const offsetX = Math.floor((canvas.width - mapCols * cellSize) / 2);
+const offsetY = Math.floor((canvas.height - mapRows * cellSize) / 2);
 
 // ASCIIマップ用文字と色
 const terrain = [
@@ -24,11 +30,11 @@ const terrain = [
 
 // 小キャラ
 const npcs = [];
-const walkChars = ['@','&','%']; // 歩行アニメ用
+const walkChars = ['@','&','%'];
 for(let i=0;i<5;i++){
   npcs.push({
-    x: Math.floor(Math.random()*cols),
-    y: Math.floor(Math.random()*rows),
+    x: Math.floor(Math.random()*mapCols),
+    y: Math.floor(Math.random()*mapRows),
     charIndex:0,
     color:'#FF5555',
     dx: Math.random()<0.5?-1:1,
@@ -50,23 +56,19 @@ function draw(){
   ctx.fillStyle='#000';
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // ASCIIマップ
-  for(let y=0;y<rows;y++){
-    for(let x=0;x<cols;x++){
+  // ASCIIマップ描画
+  for(let y=0;y<mapRows;y++){
+    for(let x=0;x<mapCols;x++){
       let t = terrain[Math.floor(Math.random()*terrain.length)];
 
       // 川の揺れ
-      if(t.char==='~'){
-        t.char = Math.random()<0.5?'~':'≈';
-      }
+      if(t.char==='~') t.char = Math.random()<0.5?'~':'≈';
 
       // 木の揺れ
-      if(t.char==='#'){
-        t.char = Math.random()<0.3?'♣':'#';
-      }
+      if(t.char==='#') t.char = Math.random()<0.3?'♣':'#';
 
       ctx.fillStyle=t.color;
-      ctx.fillText(t.char, x*14, y*14);
+      ctx.fillText(t.char, x*cellSize + offsetX, y*cellSize + offsetY);
     }
   }
 
@@ -75,16 +77,16 @@ function draw(){
     n.charIndex = (n.charIndex+1)%walkChars.length;
     const c = walkChars[n.charIndex];
     ctx.fillStyle=n.color;
-    ctx.fillText(c, n.x*14, n.y*14);
+    ctx.fillText(c, n.x*cellSize + offsetX, n.y*cellSize + offsetY);
 
     n.x += n.dx * Math.random();
     n.y += n.dy * Math.random();
 
-    if(n.x<0 || n.x>cols-1) n.dx*=-1;
-    if(n.y<0 || n.y>rows-1) n.dy*=-1;
+    if(n.x<0 || n.x>mapCols-1) n.dx*=-1;
+    if(n.y<0 || n.y>mapRows-1) n.dy*=-1;
   });
 
-  // ノイズ
+  // ノイズ（マップ周囲にも少し散布）
   for(let i=0;i<300;i++){
     const nx=Math.random()*canvas.width;
     const ny=Math.random()*canvas.height;
