@@ -109,4 +109,8 @@ footer {
   header p {
     font-size: 0.7rem;
   }
+  /* 全体をPress Start 2Pで統一 */
+body, .card, .card * {
+  font-family: 'Press Start 2P', monospace !important;
+}
 }
