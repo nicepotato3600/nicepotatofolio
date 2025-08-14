@@ -1,0 +1,57 @@
+body {
+  background-color: #000;
+  color: #33FF33;
+  font-family: 'Press Start 2P', monospace;
+  margin: 0;
+  padding: 2rem;
+}
+
+.terminal {
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+  animation: scrollUp 30s linear infinite;
+}
+
+@keyframes scrollUp {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+
+header h1, header p {
+  margin: 0.5rem 0;
+}
+
+.gallery img {
+  width: 400px;
+  height: auto;
+  image-rendering: pixelated;
+  border: 2px solid #33FF33;
+  margin: 2rem 0;
+}
+
+.links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.links li {
+  margin: 0.5rem 0;
+}
+
+.links a {
+  text-decoration: none;
+  color: #33FF33;
+  font-weight: bold;
+}
+
+.links a:hover {
+  color: #FFFFFF;
+}
+
+footer {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  color: #33FF33;
+  text-align: left;
+}
