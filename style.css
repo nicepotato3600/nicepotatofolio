@@ -7,6 +7,7 @@
   height: 100%;
   z-index: 0;
   background-color: #001f3f; /* 青背景 */
+  image-rendering: pixelated;
 }
 
 /* terminal前面表示 */
