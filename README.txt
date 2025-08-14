@@ -1,7 +1,7 @@
 # nicepotatofolio
 
 **Author:** nicepotato3600 / Gen Taguchi
-**Description:** Pixel art portfolio in a retro terminal style. Black background, pixel font, and minimal design.  
+**Description:** Pixel art portfolio.
 
 **Live Site:** [https://nicepotato3600.github.io/nicepotatofolio/]
 **Technologies Used:**  
@@ -19,4 +19,5 @@
 ---
 
 Feel free to browse the portfolio and check out my pixel art works!
+
 
