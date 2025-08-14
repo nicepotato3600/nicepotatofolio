@@ -11,7 +11,7 @@
 <body>
   <canvas id="asciiBg"></canvas>
 
-  <audio id="bgm" src="mySong.mp3" autoplay loop controls></audio>
+  <audio id="bgm" src="mySong.mp3" loop></audio>
 
   <div class="terminal">
     <header>
@@ -41,5 +41,12 @@
   </div>
 
   <script src="asciiRPG.js"></script>
+  <script>
+    // クリックまたはタップでBGM再生
+    const bgm = document.getElementById('bgm');
+    document.body.addEventListener('click', () => {
+      bgm.play().catch(()=>console.log("ユーザー操作が必要"));
+    }, {once:true});
+  </script>
 </body>
 </html>

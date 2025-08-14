@@ -11,64 +11,65 @@ window.addEventListener('resize', resizeCanvas);
 ctx.font = '14px monospace';
 const cellSize = 14;
 
-// マップサイズ（文字数）
-const mapCols = 50;
-const mapRows = 30;
-
-// マップオフセット（黒背景の余白を残す）
-const offsetX = Math.floor((canvas.width - mapCols * cellSize) / 2);
-const offsetY = Math.floor((canvas.height - mapRows * cellSize) / 2);
-
-// ASCIIマップ用文字と色
-const terrain = [
-  {char:'^', color:'#55AA55'}, // 山
-  {char:'#', color:'#228822'}, // 木
-  {char:'~', color:'#3399FF'}, // 川
-  {char:'.', color:'#33FF33'}, // 草原
-  {char:'=', color:'#AA7733'}  // 土地
+// 世界地図データ（. = 草原, ^ = 山, # = 森, ~ = 川, 空白 = 海）
+const mapData = [
+  "                     ^^^^^^                    ",
+  "         #####     ^^^^^^^^     #####         ",
+  "     ~~~~~     ^^^         ^^^      ~~~~~     ",
+  "   #####            #####            #####    ",
+  "                                           ",
+  "       ^^^                   ^^^           ",
+  "   ####       ~~~       ####             ",
+  "                         ######           ",
+  "         ^^^^^^                 ~~~       ",
+  "                                           "
 ];
 
-// 小キャラ
+const rows = mapData.length;
+const cols = mapData[0].length;
+
+// 小キャラ（陸上にのみ出現）
 const npcs = [];
 const walkChars = ['@','&','%'];
 for(let i=0;i<5;i++){
-  npcs.push({
-    x: Math.floor(Math.random()*mapCols),
-    y: Math.floor(Math.random()*mapRows),
-    charIndex:0,
-    color:'#FF5555',
-    dx: Math.random()<0.5?-1:1,
-    dy: Math.random()<0.5?-1:1
-  });
+  let placed = false;
+  while(!placed){
+    const x = Math.floor(Math.random()*cols);
+    const y = Math.floor(Math.random()*rows);
+    if(mapData[y][x] !== ' ' && mapData[y][x] !== '~'){
+      npcs.push({x, y, charIndex:0, color:'#FF5555', dx: Math.random()<0.5?-1:1, dy: Math.random()<0.5?-1:1});
+      placed = true;
+    }
+  }
 }
 
 // カーソル
 const cursor = document.querySelector('.cursor');
 let cursorOpacity=1, cursorDir=-0.05;
 
-// 揺れ用カウンター
-let frame=0;
-
 function draw(){
-  frame++;
-
-  // 背景
+  // 背景（余白は黒）
   ctx.fillStyle='#000';
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // ASCIIマップ描画
-  for(let y=0;y<mapRows;y++){
-    for(let x=0;x<mapCols;x++){
-      let t = terrain[Math.floor(Math.random()*terrain.length)];
+  const offsetX = Math.floor((canvas.width - cols*cellSize)/2);
+  const offsetY = Math.floor((canvas.height - rows*cellSize)/2);
 
-      // 川の揺れ
-      if(t.char==='~') t.char = Math.random()<0.5?'~':'≈';
+  // マップ描画
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      let ch = mapData[y][x];
+      let color = '#33FF33';
 
-      // 木の揺れ
-      if(t.char==='#') t.char = Math.random()<0.3?'♣':'#';
+      if(ch==='^') color='#55AA55';          // 山
+      else if(ch==='#') color='#228822';     // 森
+      else if(ch==='~'){                     // 川
+        color='#3399FF';
+        ch = Math.random()<0.5?'~':'≈';      // 揺れ
+      }
 
-      ctx.fillStyle=t.color;
-      ctx.fillText(t.char, x*cellSize + offsetX, y*cellSize + offsetY);
+      ctx.fillStyle=color;
+      ctx.fillText(ch, x*cellSize + offsetX, y*cellSize + offsetY);
     }
   }
 
@@ -79,21 +80,16 @@ function draw(){
     ctx.fillStyle=n.color;
     ctx.fillText(c, n.x*cellSize + offsetX, n.y*cellSize + offsetY);
 
-    n.x += n.dx * Math.random();
-    n.y += n.dy * Math.random();
+    // 移動（陸上のみ）
+    let nx = n.x + n.dx * Math.random();
+    let ny = n.y + n.dy * Math.random();
 
-    if(n.x<0 || n.x>mapCols-1) n.dx*=-1;
-    if(n.y<0 || n.y>mapRows-1) n.dy*=-1;
+    if(nx<0 || nx>=cols || mapData[n.y][Math.floor(nx)]===' ' || mapData[n.y][Math.floor(nx)]==='~') n.dx*=-1;
+    else n.x = nx;
+
+    if(ny<0 || ny>=rows || mapData[Math.floor(ny)][n.x]===' ' || mapData[Math.floor(ny)][n.x]==='~') n.dy*=-1;
+    else n.y = ny;
   });
-
-  // ノイズ（マップ周囲にも少し散布）
-  for(let i=0;i<300;i++){
-    const nx=Math.random()*canvas.width;
-    const ny=Math.random()*canvas.height;
-    const t = terrain[Math.floor(Math.random()*terrain.length)];
-    ctx.fillStyle=`rgba(255,255,255,${Math.random()*0.3})`;
-    ctx.fillText(t.char,nx,ny);
-  }
 
   // カーソル点滅
   cursorOpacity+=cursorDir;
