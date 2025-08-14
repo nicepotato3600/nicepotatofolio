@@ -1,54 +1,81 @@
-const canvas = document.getElementById('spaceBg');
+const canvas = document.getElementById('asciiBg');
 const ctx = canvas.getContext('2d');
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
 ctx.font = '14px monospace';
 
-// ターミナルカーソル
-const cursor = document.querySelector('.cursor');
-let cursorOpacity = 1;
-let cursorDir = -0.05;
-
-// マップ設定
 const cols = Math.floor(canvas.width / 14);
 const rows = Math.floor(canvas.height / 14);
-const terrainChars = ['.', ',', '^', '~', '♣', '#'];
-const terrainColors = ['#33FF33','#33AA33','#AA8833','#0033FF','#55FF55','#FFCC33'];
+
+// ASCIIマップ用文字と色
+const terrain = [
+  {char:'^', color:'#55AA55'}, // 山
+  {char:'#', color:'#228822'}, // 木
+  {char:'~', color:'#3399FF'}, // 川
+  {char:'.', color:'#33FF33'}, // 草原
+  {char:'=', color:'#AA7733'}  // 土地
+];
 
 // 小キャラ
 const npcs = [];
+const walkChars = ['@','&','%']; // 歩行アニメ用
 for(let i=0;i<5;i++){
   npcs.push({
     x: Math.floor(Math.random()*cols),
     y: Math.floor(Math.random()*rows),
-    char: '@',
+    charIndex:0,
     color:'#FF5555',
     dx: Math.random()<0.5?-1:1,
     dy: Math.random()<0.5?-1:1
   });
 }
 
-function drawRPGWorld() {
+// カーソル
+const cursor = document.querySelector('.cursor');
+let cursorOpacity=1, cursorDir=-0.05;
+
+// 揺れ用カウンター
+let frame=0;
+
+function draw(){
+  frame++;
+
   // 背景
-  ctx.fillStyle = '#000';
+  ctx.fillStyle='#000';
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // マップ描画
+  // ASCIIマップ
   for(let y=0;y<rows;y++){
     for(let x=0;x<cols;x++){
-      const char = terrainChars[Math.floor(Math.random()*terrainChars.length)];
-      const color = terrainColors[Math.floor(Math.random()*terrainColors.length)];
-      ctx.fillStyle = color;
-      ctx.fillText(char, x*14, y*14);
+      let t = terrain[Math.floor(Math.random()*terrain.length)];
+
+      // 川の揺れ
+      if(t.char==='~'){
+        t.char = Math.random()<0.5?'~':'≈';
+      }
+
+      // 木の揺れ
+      if(t.char==='#'){
+        t.char = Math.random()<0.3?'♣':'#';
+      }
+
+      ctx.fillStyle=t.color;
+      ctx.fillText(t.char, x*14, y*14);
     }
   }
 
-  // 小キャラ描画＆移動
-  npcs.forEach(n => {
-    ctx.fillStyle = n.color;
-    ctx.fillText(n.char, n.x*14, n.y*14);
+  // 小キャラ描画＆歩行アニメ
+  npcs.forEach(n=>{
+    n.charIndex = (n.charIndex+1)%walkChars.length;
+    const c = walkChars[n.charIndex];
+    ctx.fillStyle=n.color;
+    ctx.fillText(c, n.x*14, n.y*14);
 
     n.x += n.dx * Math.random();
     n.y += n.dy * Math.random();
@@ -59,24 +86,19 @@ function drawRPGWorld() {
 
   // ノイズ
   for(let i=0;i<300;i++){
-    const nx = Math.random()*canvas.width;
-    const ny = Math.random()*canvas.height;
-    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.3})`;
-    ctx.fillText(terrainChars[Math.floor(Math.random()*terrainChars.length)], nx, ny);
+    const nx=Math.random()*canvas.width;
+    const ny=Math.random()*canvas.height;
+    const t = terrain[Math.floor(Math.random()*terrain.length)];
+    ctx.fillStyle=`rgba(255,255,255,${Math.random()*0.3})`;
+    ctx.fillText(t.char,nx,ny);
   }
 
   // カーソル点滅
-  cursorOpacity += cursorDir;
+  cursorOpacity+=cursorDir;
   if(cursorOpacity<=0.1 || cursorOpacity>=1) cursorDir*=-1;
-  cursor.style.opacity = cursorOpacity;
+  cursor.style.opacity=cursorOpacity;
 
-  requestAnimationFrame(drawRPGWorld);
+  requestAnimationFrame(draw);
 }
 
-// リサイズ対応
-window.addEventListener('resize',()=>{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
-
-drawRPGWorld();
+draw();
