@@ -86,4 +86,8 @@ body::before {
   background-size: 2px 2px, 3px 3px;
   z-index: 9999;
 }
-
+.game canvas {
+  display: block;
+  margin: 1rem 0;
+  border: 1px solid #fdf6e3;
+}
