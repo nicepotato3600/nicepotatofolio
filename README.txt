@@ -7,6 +7,7 @@
 **Technologies Used:**  
 - HTML  
 - CSS  
+- JavaScript
 - Google Fonts: Press Start 2P  
 
 **External Links:**  
@@ -18,3 +19,4 @@
 ---
 
 Feel free to browse the portfolio and check out my pixel art works!
+
