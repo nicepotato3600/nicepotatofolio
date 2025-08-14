@@ -35,6 +35,10 @@ header h1, header h2, header p {
   margin: 0.3rem 0;
   text-shadow: 0 0 5px #33FF33;
 }
+.terminal h2 .highlight,
+.terminal h3 .highlight {
+  color: #ff1010 !important;  /* !importantで強制 */
+}
 
 .gallery img {
   width: 320px;
@@ -113,7 +117,5 @@ footer {
 body, .card, .card * {
   font-family: 'Press Start 2P', monospace !important;
 }
-.highlight {
-  color: #ff8b1f;  /* 好きな色に変更 */
-}
+
 }
