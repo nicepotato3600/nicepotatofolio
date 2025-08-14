@@ -15,7 +15,8 @@ Vue.component('card', {
           <slot name="content"></slot>
         </div>
       </div>
-    </div>`,
+    </div>
+  `,
   mounted() {
     this.width = this.$refs.card.offsetWidth;
     this.height = this.$refs.card.offsetHeight;
@@ -47,24 +48,24 @@ Vue.component('card', {
       const tY = this.mousePY * -40;
       return {
         transform: `translateX(${tX}px) translateY(${tY}px)`
-      }
+      };
     },
     cardBgImage() {
       return {
         backgroundImage: `url(${this.dataImage})`
-      }
+      };
     }
   },
   methods: {
     handleMouseMove(e) {
-      this.mouseX = e.pageX - this.$refs.card.offsetLeft - this.width/2;
-      this.mouseY = e.pageY - this.$refs.card.offsetTop - this.height/2;
+      this.mouseX = e.pageX - this.$refs.card.offsetLeft - this.width / 2;
+      this.mouseY = e.pageY - this.$refs.card.offsetTop - this.height / 2;
     },
     handleMouseEnter() {
       clearTimeout(this.mouseLeaveDelay);
     },
     handleMouseLeave() {
-      this.mouseLeaveDelay = setTimeout(()=>{
+      this.mouseLeaveDelay = setTimeout(() => {
         this.mouseX = 0;
         this.mouseY = 0;
       }, 1000);
@@ -72,6 +73,6 @@ Vue.component('card', {
   }
 });
 
-const app = new Vue({
+new Vue({
   el: '#app'
 });

@@ -6,7 +6,7 @@
 <title>nicepotatofolio</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="card.scss">
+<link rel="stylesheet" href="card.css">
 <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
@@ -16,19 +16,20 @@
     <header>
       <h1>Gen Taguchi / nicepotato3600</h1>
       <p>| Portfolio |</p>
+      <br>
     </header>
     <main>
       <section class="gallery">
-        <h2>Design</h2>
+        <h2>| Design |</h2>
         <div id="app" class="container">
-            <card data-image="Pragmatique.png">
-              <h1 slot="header"></h1>
-              <p slot="content">Pragmatique,2025</p>
-            </card>
+          <card data-image="Pragmatique.png">
+            <h1 slot="header"></h1>
+            <p slot="content">Pragmatique,2025</p>
+          </card>
         </div>
       </section>
       <section class="links">
-        <h3>Links:</h3>
+        <h3>| Links |</h3>
         <ul>
           <li><a href="https://x.com/nicepotato3600" target="_blank">[X]</a></li>
           <br>
@@ -49,14 +50,22 @@
       <p>&gt; <span class="cursor">_</span></p>
     </footer>
   </div>
+
+  <!-- Vue本体を先に読み込む -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+  <!-- asciiRPG -->
   <script src="asciiRPG.js"></script>
+
+  <!-- ギャラリー用のVueコンポーネント -->
   <script src="card.js"></script>
+
   <script>
     // クリックまたはタップでBGM再生
     const bgm = document.getElementById('bgm');
     document.body.addEventListener('click', () => {
-      bgm.play().catch(()=>console.log("ユーザー操作が必要"));
-    }, {once:true});
+      bgm.play().catch(() => console.log("ユーザー操作が必要"));
+    }, { once: true });
   </script>
 </body>
 </html>
