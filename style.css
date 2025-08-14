@@ -30,7 +30,7 @@ body {
   backdrop-filter: blur(2px);
 }
 
-header h1, header p {
+header h1, header h2, header p {
   margin: 0.3rem 0;
   text-shadow: 0 0 5px #33FF33;
 }
