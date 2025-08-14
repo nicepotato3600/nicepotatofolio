@@ -1,42 +1,41 @@
-/* 全画面 canvas 背景 */
-#spaceBg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  background-color: #001f3f; /* 青背景 */
-  image-rendering: pixelated;
+body {
+  margin:0;
+  padding:0;
+  font-family: 'Press Start 2P', monospace;
 }
 
-/* terminal前面表示 */
+#spaceBg {
+  position: fixed;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  z-index:0;
+  image-rendering: pixelated;
+  background-color: #000;
+}
+
 .terminal {
   position: relative;
   z-index: 1;
   max-width: 1000px;
   margin: 1rem;
-  color: #fdf6e3; /* クリーム色 */
-  font-family: 'Press Start 2P', monospace;
+  color: #fdf6e3;
 }
 
-/* header */
 header h1, header p {
   margin: 0.3rem 0;
-  font-weight: normal;
 }
 
-/* ギャラリー画像 */
 .gallery img {
   width: 320px;
   height: auto;
   image-rendering: pixelated;
   border: 1px solid #fdf6e3;
   margin: 1rem 0;
-  display: block;
+  display:block;
 }
 
-/* リンク */
 .links ul {
   list-style: none;
   padding: 0;
@@ -53,17 +52,15 @@ header h1, header p {
 }
 
 .links a:hover {
-  color: #ffffff;
+  color: #fff;
 }
 
-/* フッター */
 footer {
   margin-top: 2rem;
   font-size: 0.8rem;
   text-align: left;
 }
 
-/* カーソル */
 .cursor {
   display: inline-block;
 }
