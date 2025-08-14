@@ -34,7 +34,9 @@ header h1, header h2, header p {
   margin: 0.3rem 0;
   text-shadow: 0 0 5px #33FF33;
 }
-
+ul {
+  display: flex;
+}
 .gallery img {
   width: 320px;
   height: auto;
