@@ -1,15 +1,16 @@
-// DwarfFortress風アスキーアートRPGマップアニメーション
+// DwarfFortress風アスキーアートRPGマップアニメーション - GitHub Pages最適化版
 class AsciiRPGMap {
     constructor() {
         this.canvas = null;
         this.ctx = null;
-        this.mapWidth = 120;
-        this.mapHeight = 60;
-        this.cellSize = 12;
+        this.mapWidth = 80;
+        this.mapHeight = 40;
+        this.cellSize = 10;
         this.map = [];
         this.characters = [];
         this.animationFrame = 0;
         this.lastTime = 0;
+        this.isInitialized = false;
         
         // 地形タイプ
         this.TERRAIN = {
@@ -43,34 +44,62 @@ class AsciiRPGMap {
     }
     
     init() {
-        this.createCanvas();
+        console.log('AsciiRPGMap initialization started');
+        
+        if (!this.createCanvas()) {
+            console.error('Canvas initialization failed');
+            return false;
+        }
+        
+        console.log('Generating world map...');
         this.generateMap();
+        
+        console.log('Spawning characters...');
         this.spawnCharacters();
+        
+        console.log('Starting animation loop...');
+        this.isInitialized = true;
         this.animate();
+        
+        return true;
     }
     
     createCanvas() {
-        // 既存のcanvas要素を使用
         this.canvas = document.getElementById('asciiBg');
+        
         if (!this.canvas) {
             console.error('Canvas element with id "asciiBg" not found');
-            return;
+            return false;
         }
         
+        // キャンバスサイズを設定
         this.canvas.width = this.mapWidth * this.cellSize;
         this.canvas.height = this.mapHeight * this.cellSize;
         
+        console.log(`Canvas initialized: ${this.canvas.width}x${this.canvas.height}`);
+        
         this.ctx = this.canvas.getContext('2d');
+        if (!this.ctx) {
+            console.error('Could not get 2D context');
+            return false;
+        }
+        
         this.ctx.font = `${this.cellSize - 2}px monospace`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
+        
+        return true;
     }
     
     generateMap() {
         // マップを初期化（海で埋める）
-        this.map = Array(this.mapHeight).fill().map(() => 
-            Array(this.mapWidth).fill(this.TERRAIN.DEEP_WATER)
-        );
+        this.map = [];
+        for (let y = 0; y < this.mapHeight; y++) {
+            this.map[y] = [];
+            for (let x = 0; x < this.mapWidth; x++) {
+                this.map[y][x] = this.TERRAIN.DEEP_WATER;
+            }
+        }
         
         // 大陸を生成
         this.generateContinents();
@@ -86,12 +115,12 @@ class AsciiRPGMap {
     }
     
     generateContinents() {
-        const numContinents = Math.random() * 2 + 2;
+        const numContinents = Math.floor(Math.random() * 2) + 2;
         
         for (let i = 0; i < numContinents; i++) {
-            const centerX = Math.random() * (this.mapWidth - 20) + 10;
-            const centerY = Math.random() * (this.mapHeight - 20) + 10;
-            const size = Math.random() * 15 + 10;
+            const centerX = Math.floor(Math.random() * (this.mapWidth - 20)) + 10;
+            const centerY = Math.floor(Math.random() * (this.mapHeight - 20)) + 10;
+            const size = Math.floor(Math.random() * 10) + 8;
             
             this.generateContinent(centerX, centerY, size);
         }
@@ -101,7 +130,7 @@ class AsciiRPGMap {
         for (let y = Math.max(0, centerY - size); y < Math.min(this.mapHeight, centerY + size); y++) {
             for (let x = Math.max(0, centerX - size); x < Math.min(this.mapWidth, centerX + size); x++) {
                 const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-                const noise = (Math.random() - 0.5) * 3;
+                const noise = (Math.random() - 0.5) * 2;
                 
                 if (distance + noise < size) {
                     if (distance + noise < size * 0.3) {
@@ -119,26 +148,35 @@ class AsciiRPGMap {
     }
     
     generateRivers() {
-        const numRivers = Math.random() * 3 + 2;
+        const numRivers = Math.floor(Math.random() * 2) + 2;
         
         for (let i = 0; i < numRivers; i++) {
-            let x = Math.floor(Math.random() * this.mapWidth);
-            let y = Math.floor(Math.random() * this.mapHeight);
-            
             // 山から始める
-            while (this.map[y] && this.map[y][x] && this.map[y][x] !== this.TERRAIN.MOUNTAIN) {
-                x = Math.floor(Math.random() * this.mapWidth);
-                y = Math.floor(Math.random() * this.mapHeight);
+            let startX = -1, startY = -1;
+            let attempts = 0;
+            
+            while (attempts < 50) {
+                const x = Math.floor(Math.random() * this.mapWidth);
+                const y = Math.floor(Math.random() * this.mapHeight);
+                
+                if (this.map[y][x] === this.TERRAIN.MOUNTAIN) {
+                    startX = x;
+                    startY = y;
+                    break;
+                }
+                attempts++;
             }
             
-            this.generateRiver(x, y);
+            if (startX !== -1) {
+                this.generateRiver(startX, startY);
+            }
         }
     }
     
     generateRiver(startX, startY) {
         let x = startX;
         let y = startY;
-        const riverLength = Math.random() * 30 + 20;
+        const riverLength = Math.floor(Math.random() * 20) + 15;
         
         for (let i = 0; i < riverLength; i++) {
             if (x >= 0 && x < this.mapWidth && y >= 0 && y < this.mapHeight) {
@@ -146,27 +184,33 @@ class AsciiRPGMap {
                 this.map[y][x] = this.TERRAIN.RIVER;
             }
             
-            // 海に向かって流れる傾向
-            const directionX = Math.random() < 0.6 ? (Math.random() < 0.5 ? -1 : 1) : 0;
-            const directionY = Math.random() < 0.6 ? (Math.random() < 0.5 ? -1 : 1) : 0;
+            // ランダムな方向に流れる
+            const directions = [
+                { dx: -1, dy: 0 }, { dx: 1, dy: 0 },
+                { dx: 0, dy: -1 }, { dx: 0, dy: 1 },
+                { dx: -1, dy: -1 }, { dx: 1, dy: 1 },
+                { dx: -1, dy: 1 }, { dx: 1, dy: -1 }
+            ];
             
-            x += directionX;
-            y += directionY;
+            const direction = directions[Math.floor(Math.random() * directions.length)];
+            x += direction.dx;
+            y += direction.dy;
         }
     }
     
     generateDetailedTerrain() {
+        // フォレストを追加
         for (let y = 0; y < this.mapHeight; y++) {
             for (let x = 0; x < this.mapWidth; x++) {
-                if (this.map[y][x] === this.TERRAIN.GRASS && Math.random() < 0.3) {
+                if (this.map[y][x] === this.TERRAIN.GRASS && Math.random() < 0.25) {
                     this.map[y][x] = this.TERRAIN.FOREST;
                 }
                 
                 // 海岸線に砂浜を作る
                 if (this.map[y][x] === this.TERRAIN.DEEP_WATER) {
                     let hasLand = false;
-                    for (let dy = -1; dy <= 1; dy++) {
-                        for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1 && !hasLand; dy++) {
+                        for (let dx = -1; dx <= 1 && !hasLand; dx++) {
                             const ny = y + dy;
                             const nx = x + dx;
                             if (ny >= 0 && ny < this.mapHeight && nx >= 0 && nx < this.mapWidth) {
@@ -174,13 +218,11 @@ class AsciiRPGMap {
                                     this.map[ny][nx] !== this.TERRAIN.SHALLOW_WATER &&
                                     this.map[ny][nx] !== this.TERRAIN.RIVER) {
                                     hasLand = true;
-                                    break;
                                 }
                             }
                         }
-                        if (hasLand) break;
                     }
-                    if (hasLand && Math.random() < 0.7) {
+                    if (hasLand && Math.random() < 0.6) {
                         this.map[y][x] = this.TERRAIN.SHALLOW_WATER;
                     }
                 }
@@ -190,26 +232,25 @@ class AsciiRPGMap {
     
     generateCivilization() {
         // 町を生成
-        const numTowns = Math.random() * 5 + 3;
+        const numTowns = Math.floor(Math.random() * 3) + 2;
         const towns = [];
         
         for (let i = 0; i < numTowns; i++) {
             let x, y;
             let attempts = 0;
+            
             do {
                 x = Math.floor(Math.random() * this.mapWidth);
                 y = Math.floor(Math.random() * this.mapHeight);
                 attempts++;
-            } while (attempts < 100 && (
-                !this.map[y] || 
-                !this.map[y][x] || 
+            } while (attempts < 50 && (
                 this.map[y][x] === this.TERRAIN.DEEP_WATER ||
                 this.map[y][x] === this.TERRAIN.SHALLOW_WATER ||
                 this.map[y][x] === this.TERRAIN.RIVER ||
                 this.map[y][x] === this.TERRAIN.MOUNTAIN
             ));
             
-            if (attempts < 100) {
+            if (attempts < 50) {
                 this.map[y][x] = this.TERRAIN.TOWN;
                 towns.push({ x, y });
             }
@@ -225,7 +266,7 @@ class AsciiRPGMap {
         let x = start.x;
         let y = start.y;
         
-        while (x !== end.x || y !== end.y) {
+        while ((x !== end.x || y !== end.y) && Math.abs(x - start.x) + Math.abs(y - start.y) < 50) {
             if (x < end.x) x++;
             else if (x > end.x) x--;
             
@@ -245,7 +286,8 @@ class AsciiRPGMap {
     }
     
     spawnCharacters() {
-        const numCharacters = Math.random() * 15 + 10;
+        const numCharacters = Math.floor(Math.random() * 8) + 6;
+        this.characters = [];
         
         for (let i = 0; i < numCharacters; i++) {
             let x, y;
@@ -255,15 +297,13 @@ class AsciiRPGMap {
                 x = Math.floor(Math.random() * this.mapWidth);
                 y = Math.floor(Math.random() * this.mapHeight);
                 attempts++;
-            } while (attempts < 100 && (
-                !this.map[y] || 
-                !this.map[y][x] || 
+            } while (attempts < 50 && (
                 this.map[y][x] === this.TERRAIN.DEEP_WATER ||
                 this.map[y][x] === this.TERRAIN.SHALLOW_WATER ||
                 this.map[y][x] === this.TERRAIN.MOUNTAIN
             ));
             
-            if (attempts < 100) {
+            if (attempts < 50) {
                 const characterType = this.CHARACTER_TYPES[Math.floor(Math.random() * this.CHARACTER_TYPES.length)];
                 this.characters.push({
                     x: x,
@@ -271,21 +311,21 @@ class AsciiRPGMap {
                     char: characterType.char,
                     color: characterType.color,
                     name: characterType.name,
-                    direction: { x: 0, y: 0 },
-                    speed: Math.random() * 0.5 + 0.2,
+                    speed: Math.random() * 0.3 + 0.15,
                     lastMove: 0,
-                    target: null,
-                    pathIndex: 0
+                    target: null
                 });
             }
         }
+        
+        console.log(`Spawned ${this.characters.length} characters`);
     }
     
     updateCharacters(currentTime) {
         this.characters.forEach(character => {
-            if (currentTime - character.lastMove > 1000 / character.speed) {
-                // 新しい目標を設定（時々）
-                if (!character.target || Math.random() < 0.1) {
+            if (currentTime - character.lastMove > 2000 / character.speed) {
+                // 新しい目標を設定
+                if (!character.target || Math.random() < 0.15) {
                     character.target = {
                         x: Math.floor(Math.random() * this.mapWidth),
                         y: Math.floor(Math.random() * this.mapHeight)
@@ -321,12 +361,17 @@ class AsciiRPGMap {
     }
     
     render() {
+        if (!this.ctx || !this.isInitialized) return;
+        
+        // 背景をクリア
         this.ctx.fillStyle = '#001122';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // 地形を描画
         for (let y = 0; y < this.mapHeight; y++) {
             for (let x = 0; x < this.mapWidth; x++) {
+                if (!this.map[y] || !this.map[y][x]) continue;
+                
                 const terrain = this.map[y][x];
                 const screenX = x * this.cellSize;
                 const screenY = y * this.cellSize;
@@ -343,7 +388,7 @@ class AsciiRPGMap {
                     terrain === this.TERRAIN.SHALLOW_WATER || 
                     terrain === this.TERRAIN.RIVER) {
                     const waveChars = ['~', '≈', '∼'];
-                    char = waveChars[Math.floor((this.animationFrame / 10 + x + y) % 3)];
+                    char = waveChars[Math.floor((this.animationFrame / 15 + x + y) % 3)];
                 }
                 
                 this.ctx.fillText(char, screenX + this.cellSize / 2, screenY + this.cellSize / 2);
@@ -355,8 +400,8 @@ class AsciiRPGMap {
             const screenX = character.x * this.cellSize;
             const screenY = character.y * this.cellSize;
             
-            // キャラクターの背景（少し暗く）
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            // キャラクターの背景
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             this.ctx.fillRect(screenX, screenY, this.cellSize, this.cellSize);
             
             // キャラクター
@@ -366,7 +411,10 @@ class AsciiRPGMap {
     }
     
     animate(currentTime = 0) {
-        if (currentTime - this.lastTime > 50) { // 20 FPS
+        if (!this.isInitialized) return;
+        
+        // 30 FPS
+        if (currentTime - this.lastTime > 33) {
             this.updateCharacters(currentTime);
             this.render();
             this.animationFrame++;
@@ -377,23 +425,44 @@ class AsciiRPGMap {
     }
 }
 
-// ページ読み込み時に自動開始
-document.addEventListener('DOMContentLoaded', () => {
-    window.asciiRPGMapInstance = new AsciiRPGMap();
-});
-
-// ウィンドウリサイズ時の対応
-window.addEventListener('resize', () => {
+// GitHub Pages最適化初期化関数
+function initializeAsciiRPG() {
+    console.log('Attempting to initialize AsciiRPGMap...');
+    
     const canvas = document.getElementById('asciiBg');
-    if (canvas) {
-        // キャンバスサイズを再調整
-        const map = window.asciiRPGMapInstance;
-        if (map) {
-            canvas.width = map.mapWidth * map.cellSize;
-            canvas.height = map.mapHeight * map.cellSize;
-        }
+    if (!canvas) {
+        console.warn('Canvas not found, retrying in 100ms...');
+        setTimeout(initializeAsciiRPG, 100);
+        return;
+    }
+    
+    try {
+        window.asciiRPGMapInstance = new AsciiRPGMap();
+        console.log('AsciiRPGMap successfully initialized!');
+    } catch (error) {
+        console.error('Failed to initialize AsciiRPGMap:', error);
+    }
+}
+
+// 複数のタイミングで初期化を試行（GitHub Pagesの安定性向上）
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAsciiRPG);
+} else {
+    initializeAsciiRPG();
+}
+
+window.addEventListener('load', () => {
+    if (!window.asciiRPGMapInstance) {
+        console.log('Fallback initialization on window load');
+        setTimeout(initializeAsciiRPG, 50);
     }
 });
 
-// グローバルインスタンスを保持
-window.asciiRPGMapInstance = null;
+// リサイズ対応
+window.addEventListener('resize', () => {
+    if (window.asciiRPGMapInstance && window.asciiRPGMapInstance.canvas) {
+        const map = window.asciiRPGMapInstance;
+        map.canvas.width = map.mapWidth * map.cellSize;
+        map.canvas.height = map.mapHeight * map.cellSize;
+    }
+});

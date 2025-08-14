@@ -1,62 +1,111 @@
 body {
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
   font-family: 'Press Start 2P', monospace;
   background: #000;
+  overflow-x: auto;
 }
 
 #asciiBg {
   position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
   image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .terminal {
   position: relative;
-  z-index:1;
+  z-index: 1;
   max-width: 1000px;
-  margin:1rem;
-  color:#33FF33;
+  margin: 1rem;
+  color: #33FF33;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  border-radius: 4px;
+  backdrop-filter: blur(2px);
 }
 
 header h1, header p {
-  margin:0.3rem 0;
+  margin: 0.3rem 0;
+  text-shadow: 0 0 5px #33FF33;
 }
 
 .gallery img {
-  width:320px;
-  height:auto;
+  width: 320px;
+  height: auto;
   image-rendering: pixelated;
-  border:1px solid #33FF33;
-  margin:1rem 0;
-  display:block;
+  border: 1px solid #33FF33;
+  margin: 1rem 0;
+  display: block;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.3);
 }
 
 .links ul {
-  list-style:none;
-  padding:0;
-  margin:0.5rem 0;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
 }
 
-.links li { margin:0.3rem 0; }
+.links li { 
+  margin: 0.3rem 0; 
+}
 
 .links a {
-  text-decoration:none;
-  color:#33FF33;
+  text-decoration: none;
+  color: #33FF33;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 3px #33FF33;
 }
 
-.links a:hover { color:#FFFFFF; }
+.links a:hover { 
+  color: #FFFFFF;
+  text-shadow: 0 0 8px #FFFFFF;
+}
+
+.links h2 {
+  color: #33FF33;
+  text-shadow: 0 0 5px #33FF33;
+  margin: 1rem 0 0.5rem 0;
+}
 
 footer {
-  margin-top:2rem;
-  font-size:0.8rem;
-  text-align:left;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  text-align: left;
 }
 
 .cursor {
-  display:inline-block;
+  display: inline-block;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .terminal {
+    margin: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .gallery img {
+    width: 100%;
+    max-width: 320px;
+  }
+  
+  header h1 {
+    font-size: 1rem;
+  }
+  
+  header p {
+    font-size: 0.7rem;
+  }
 }
