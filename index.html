@@ -9,9 +9,8 @@
 <link rel="icon" type="image/png" href="favicon.png">
 </head>
 
-<script src="game.js"></script>
-
 <body>
+  <canvas id="spaceBg"></canvas>
   <div class="terminal">
     <header>
       <h1>Pragmatique, 2025</h1>
@@ -21,11 +20,8 @@
     <main>
       <section class="gallery">
         <img src="Pragmatique.png" alt="Pragmatique, 2025">
-        <canvas id="spaceInvader" width="400" height="300"></canvas>
       </section>
-        <section class="game">
-        <canvas id="spaceInvader" width="400" height="300"></canvas>
-      </section>
+
       <section class="links">
         <h2>Links</h2>
         <ul>
@@ -38,8 +34,10 @@
     </main>
 
     <footer>
-       <p>&gt; <span class="cursor">_</span></p>
+      <p>&gt; <span class="cursor">_</span></p>
     </footer>
   </div>
+
+  <script src="spaceBg.js"></script>
 </body>
 </html>
